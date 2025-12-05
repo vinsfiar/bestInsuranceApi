@@ -30,3 +30,5 @@ databaseChangeLog:
                 file: changelog/cities_data.csv
                 encoding: UTF-8
                 quotchar:  '"'
+- include:
+        file: db/changelog/002-prj4-changes.sql

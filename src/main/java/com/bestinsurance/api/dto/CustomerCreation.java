@@ -2,7 +2,9 @@ package com.bestinsurance.api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 public class CustomerCreation{
     @NotBlank
@@ -14,6 +16,8 @@ public class CustomerCreation{
     @NotBlank
     @Email
     private String email;
+    @NotNull
+    private LocalDate birthDate;
     @NotBlank
     @Size(max=128)
     private String address;
@@ -88,5 +92,13 @@ public class CustomerCreation{
 
     public void setIdState(String idState) {
         this.idState = idState;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

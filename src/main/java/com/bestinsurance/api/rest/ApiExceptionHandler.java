@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,6 +32,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String illegalArgumentHandler(IllegalArgumentException ex) {
+        return ex.getClass().toString() + ": " + ex.getMessage();
+    }
+    @ResponseBody
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String methodArgumentTypeMismatchHandler(MethodArgumentTypeMismatchException ex) {
         return ex.getClass().toString() + ": " + ex.getMessage();
     }
 }

@@ -35,6 +35,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             customer.setName(customerCreationDTO.getName());
             customer.setSurname(customerCreationDTO.getSurname());
             customer.setEmail(customerCreationDTO.getEmail());
+            customer.setBirthDate(customerCreationDTO.getBirthDate());
             if (!StringUtils.isBlank(customerCreationDTO.getAddress())) {
                 Address address = new Address();
                 address.setAddress(customerCreationDTO.getAddress());

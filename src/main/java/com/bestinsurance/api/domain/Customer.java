@@ -5,6 +5,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Set;
@@ -29,6 +30,9 @@ public class Customer implements DomainObject<UUID>{
 
     @Column(nullable = false, length = 320)
     private String email;
+
+    @Column
+    private LocalDate birthDate;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -120,6 +124,14 @@ public class Customer implements DomainObject<UUID>{
 
     public void setCustomerSubscriptions(final Set<Subscription> customerSubscriptions) {
         this.customerSubscriptions = customerSubscriptions;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     @Override

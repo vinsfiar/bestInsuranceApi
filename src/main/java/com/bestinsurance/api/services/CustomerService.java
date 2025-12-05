@@ -74,6 +74,22 @@ public class CustomerService extends AbstractCrudService<Customer, UUID>{
         return customerList;
     }
 
+    public List<Customer> findByPolicy(UUID policyId) {
+        return this.customerRepository.selectCustomersByPolicy(policyId);
+    }
+
+    public List<Customer> findByCoverage(UUID coverageId) {
+        return this.customerRepository.selectCustomersByCoverage(coverageId);
+    }
+
+    public List<Customer> findWithDiscount() {
+        return this.customerRepository.selectCustomersWithDiscount();
+    }
+
+    public List<Customer> findWithSubscriptionBetween(LocalDate start, LocalDate end) {
+        return this.customerRepository.selectCustomersWithSubscriptionBetween(start, end);
+    }
+
     private Specification<Customer> getSpecFromDatesAndExample(Integer ageFrom, Integer ageTo, Example<Customer> example) {
         return (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();

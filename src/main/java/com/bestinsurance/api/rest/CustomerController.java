@@ -13,9 +13,10 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -79,6 +80,54 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
                     .map(this.getSearchDtoMapper()::map).toList();
         } catch (Exception e){
             logger.error("Error during search: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/policy/{" + ID + "}")
+    @Parameter(in = ParameterIn.PATH, name = ID, schema = @Schema(type="string"), required = true)
+    public List<CustomerView> searchByPolicy(@PathVariable Map<String, String> id) {
+        try {
+            return this.customerService.findByPolicy(this.getIdMapper().map(id)).stream()
+                    .map(this.getSearchDtoMapper()::map).toList();
+        } catch (Exception e){
+            logger.error("Error during searchByPolicy: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/coverage/{" + ID + "}")
+    @Parameter(in = ParameterIn.PATH, name = ID, schema = @Schema(type="string"), required = true)
+    public List<CustomerView> searchByCoverage(@PathVariable Map<String, String> id) {
+        try {
+            return this.customerService.findByCoverage(this.getIdMapper().map(id)).stream()
+                    .map(this.getSearchDtoMapper()::map).toList();
+        } catch (Exception e){
+            logger.error("Error during searchByCoverage: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/subscriptions/discountedPrice")
+    public List<CustomerView> searchWithDiscount() {
+        try {
+            return this.customerService.findWithDiscount().stream()
+                    .map(this.getSearchDtoMapper()::map).toList();
+        } catch (Exception e){
+            logger.error("Error during searchWithDiscount: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/subscriptions")
+    public List<CustomerView> searchWithSubscriptionBetween(
+            @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd") LocalDate endDate) {
+        try {
+            return this.customerService.findWithSubscriptionBetween(startDate, endDate).stream()
+                    .map(this.getSearchDtoMapper()::map).toList();
+        } catch (Exception e){
+            logger.error("Error during searchWithSubscriptionBetween: ", e);
             throw new RuntimeException(e.getMessage());
         }
     }

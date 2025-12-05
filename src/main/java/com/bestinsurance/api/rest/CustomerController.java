@@ -8,11 +8,16 @@ import com.bestinsurance.api.dto.mappers.CustomerViewMapper;
 import com.bestinsurance.api.dto.mappers.DTOMapper;
 import com.bestinsurance.api.services.CrudService;
 import com.bestinsurance.api.services.CustomerService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 /**
  * Controller impelmenting the Customers crud API
@@ -20,12 +25,62 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/customers")
 public class CustomerController extends AbstractSimpleIdCrudController<CustomerCreation, CustomerUpdate, CustomerView, Customer> {
+    public final static String NAME = "name";
+    public final static String SURNAME = "surname";
+    public final static String EMAIL = "email";
+    public final static String AGE = "age";
+    public final static String AGE_FROM = "ageFrom";
+    public final static String AGE_TO = "ageTo";
+    public final static String ORDER_BY = "orderBy";
+    public final static String ORDER_DIRECTION = "orderDirection";
     @Autowired
     private CustomerService customerService;
 
     @Override
     protected CrudService<Customer, UUID> getService() {
         return this.customerService;
+    }
+
+    @Parameter(in = ParameterIn.QUERY, name = NAME, schema = @Schema(type="string"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = SURNAME, schema = @Schema(type="string"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = EMAIL, schema = @Schema(type="string"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = AGE_FROM, schema = @Schema(type="number"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = AGE_TO, schema = @Schema(type="number"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = ORDER_BY, schema = @Schema(type="string" , allowableValues = {NAME, SURNAME, EMAIL, AGE}), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = ORDER_DIRECTION, schema = @Schema(type="string", allowableValues = {"ASC", "DESC"}), required = false)
+    @Override
+    public List<CustomerView> all(Map<String, String> filters) {
+        try {
+            Integer ageFrom = filters.get(AGE_FROM) == null ? null : Integer.valueOf(filters.get(AGE_FROM));
+            Integer ageTo = filters.get(AGE_TO) == null ? null : Integer.valueOf(filters.get(AGE_TO));
+            if (!(ageFrom == null && ageTo == null) && (ageFrom == null || ageTo == null)){
+                throw new IllegalArgumentException("When searching by age, ageFrom and ageTo are mandatory");
+            }
+            if (ageFrom != null && ageFrom > ageTo) { //check on ageTo doesn't make sense because here the only null case is both dates null, so checking ageFrom is enough
+                throw new IllegalArgumentException("Not valid: ageFrom > ageTo");
+            }
+            String orderByParam = filters.get(ORDER_BY);
+            CustomerService.OrderBy orderBy;
+            if (orderByParam != null){
+                if (AGE.equalsIgnoreCase(orderByParam)) {
+                    orderBy = CustomerService.OrderBy.birthDate;
+                } else {
+                    orderBy = CustomerService.OrderBy.valueOf(orderByParam.toLowerCase());
+                }
+            } else {
+                orderBy = CustomerService.OrderBy.valueOf(NAME.toLowerCase());
+            }
+
+            CustomerService.OrderDirection orderDirection = filters.get(ORDER_DIRECTION) == null ? null :
+                    CustomerService.OrderDirection.valueOf(filters.get(ORDER_DIRECTION).toUpperCase());
+
+            return customerService.findAllWithFilters(filters.get(NAME), filters.get(SURNAME),
+                            filters.get(EMAIL), ageFrom, ageTo, orderBy, orderDirection).stream()
+                    .map(this.getSearchDtoMapper()::map).toList();
+        } catch (Exception e){
+            logger.error("Error during search: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override

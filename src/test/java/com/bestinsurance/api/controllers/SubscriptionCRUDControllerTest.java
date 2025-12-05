@@ -148,6 +148,7 @@ public class SubscriptionCRUDControllerTest {
         customer.setName("testNameSubs");
         customer.setSurname("testSurnameSubs");
         customer.setEmail("testEmailSubs@email.com");
+        customer.setBirthDate(LocalDate.now().minusYears(30));
         Address address = new Address();
         address.setAddress("123 Test Street, APT 4");
         address.setPostalCode("12345-44");

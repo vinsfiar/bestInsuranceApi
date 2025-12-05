@@ -1,5 +1,6 @@
 package com.bestinsurance.api.dto;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public class CustomerView {
@@ -7,6 +8,7 @@ public class CustomerView {
     private String name;
     private String surname;
     private String email;
+    private LocalDate birthDate;
     private AddressView address;
     private OffsetDateTime created;
     private OffsetDateTime updated;
@@ -65,5 +67,13 @@ public class CustomerView {
 
     public void setUpdated(OffsetDateTime updated) {
         this.updated = updated;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

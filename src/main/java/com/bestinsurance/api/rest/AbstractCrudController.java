@@ -22,7 +22,7 @@ import java.util.Optional;
  */
 public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, DomainObj, DomainObjId>
                     implements CrudController<CreateDTO, UpdateDTO, SearchDTO>{
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public SearchDTO create(CreateDTO dto) {
@@ -35,7 +35,7 @@ public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, D
     }
 
     @Override
-    public List<SearchDTO> all() {
+    public List<SearchDTO> all(Map<String, String> filters) {
         try {
             return getService().findAll().stream().map(this.getSearchDtoMapper()::map).toList();
         } catch (Exception e){
@@ -49,6 +49,9 @@ public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, D
         try {
             Optional<DomainObj> byId = this.getService().getById(this.getIdMapper().map(id));
             if (byId.isPresent()) return this.getSearchDtoMapper().map(byId.get());
+        } catch (IllegalArgumentException ille) {
+            logger.error("searchById: Illegal argument", ille);
+            throw ille;
         } catch (Exception e){
             logger.error("Error during searchById: ", e);
             throw new RuntimeException(e.getMessage());
@@ -60,7 +63,10 @@ public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, D
     public SearchDTO update(Map<String, String> id, UpdateDTO dto) {
         try {
             return this.getSearchDtoMapper().map(this.getService().update(this.getIdMapper().map(id), this.getUpdateDtoMapper().map(dto)));
-        } catch (NoSuchElementException ne) {
+        }  catch (IllegalArgumentException ille) {
+            logger.error("searchById: Illegal argument", ille);
+            throw ille;
+        }catch (NoSuchElementException ne) {
             logger.error("Error during update: ", ne);
             throw ne;
         } catch (Exception e){
@@ -73,7 +79,10 @@ public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, D
     public void delete(Map<String, String> id) {
         try {
             getService().delete(this.getIdMapper().map(id));
-        } catch (NoSuchElementException nse) {
+        }  catch (IllegalArgumentException ille) {
+            logger.error("searchById: Illegal argument", ille);
+            throw ille;
+        }catch (NoSuchElementException nse) {
             logger.error("Tried to delete not existing id from db: {} ", id);
             throw nse;
         }catch (Exception e){

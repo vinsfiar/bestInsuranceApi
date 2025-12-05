@@ -26,10 +26,11 @@ public interface CrudController<CreateDTO, UpdateDTO, SearchDTO> {
 
     /**
      * Returns all the object managed by the implementing controller
+     * @param filters a map containing the search filters
      * @return a list of SearchDTOs
      */
     @GetMapping
-    List<SearchDTO> all();
+    List<SearchDTO> all(@RequestParam(required = false) Map<String, String> filters);
 
     /**
      * Allows the search by id. As the id maybe composed by more than one field

@@ -15,7 +15,7 @@ public class CustomerViewMapper implements DTOMapper<Customer, CustomerView> {
         customerViewDTO.setEmail(customer.getEmail());
         customerViewDTO.setCreated(customer.getCreated());
         customerViewDTO.setUpdated(customer.getUpdated());
-
+        customerViewDTO.setBirthDate(customer.getBirthDate());
         AddressView addressDTO = new AddressView();
         addressDTO.setId(customer.getAddress().getAddressId().toString());
         addressDTO.setAddress(customer.getAddress().getAddress());

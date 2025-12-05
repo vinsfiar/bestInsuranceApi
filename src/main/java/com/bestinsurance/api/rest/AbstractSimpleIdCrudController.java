@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 public abstract class AbstractSimpleIdCrudController<CreateDTO, UpdateDTO , SearchDTO, DomainObj> extends
         AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, DomainObj, UUID>{
-    private static final String ID = "id";
+    protected static final String ID = "id";
 
     @GetMapping("/{" + ID + "}")
     @Parameter(in = ParameterIn.PATH, name = ID, schema = @Schema(type="string"), required = true)

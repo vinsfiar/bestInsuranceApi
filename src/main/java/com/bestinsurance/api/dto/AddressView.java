@@ -8,6 +8,17 @@ public class AddressView  {
     private CityView city;
     private StateView state;
 
+    public record CityView(String id, String name) {}
+    public record CountryView(String id, String name) {}
+    public record StateView(String id, String name) {}
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -46,13 +57,5 @@ public class AddressView  {
 
     public void setState(StateView state) {
         this.state = state;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

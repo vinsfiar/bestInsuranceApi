@@ -1,15 +1,23 @@
 package com.bestinsurance.api.dto;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
-public class CustomerView {
+public class PolicyView {
     private String id;
+
     private String name;
-    private String surname;
-    private String email;
-    private AddressView address;
+
+    private String description;
+
+    private BigDecimal price;
+
     private OffsetDateTime created;
+
     private OffsetDateTime updated;
+
+    private List<CoverageView> policiesCoverages;
 
     public String getId() {
         return id;
@@ -27,28 +35,20 @@ public class CustomerView {
         this.name = name;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getDescription() {
+        return description;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getEmail() {
-        return email;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public AddressView getAddress() {
-        return address;
-    }
-
-    public void setAddress(AddressView address) {
-        this.address = address;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public OffsetDateTime getCreated() {
@@ -65,5 +65,13 @@ public class CustomerView {
 
     public void setUpdated(OffsetDateTime updated) {
         this.updated = updated;
+    }
+
+    public List<CoverageView> getPoliciesCoverages() {
+        return policiesCoverages;
+    }
+
+    public void setPoliciesCoverages(List<CoverageView> policiesCoverages) {
+        this.policiesCoverages = policiesCoverages;
     }
 }

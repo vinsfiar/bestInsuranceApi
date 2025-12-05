@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "addresses")
-public class Address {
+public class Address implements DomainObject<UUID>{
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -43,6 +43,11 @@ public class Address {
     @Override
     public int hashCode() {
         return Objects.hash(addressId);
+    }
+
+    @Override
+    public void setId(UUID id) {
+        this.setAddressId(id);
     }
 
     public UUID getAddressId() {

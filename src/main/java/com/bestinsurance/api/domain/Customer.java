@@ -14,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "customers")
 @EntityListeners(AuditingEntityListener.class)
-public class Customer {
+public class Customer implements DomainObject<UUID>{
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -122,4 +122,8 @@ public class Customer {
         this.customerSubscriptions = customerSubscriptions;
     }
 
+    @Override
+    public void setId(UUID id) {
+        this.setCustomerId(id);
+    }
 }

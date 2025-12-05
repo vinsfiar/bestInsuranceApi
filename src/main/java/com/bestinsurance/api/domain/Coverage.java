@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "coverages")
-public class Coverage {
+public class Coverage implements DomainObject<UUID>{
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -69,4 +69,8 @@ public class Coverage {
         this.policies = policies;
     }
 
+    @Override
+    public void setId(UUID id) {
+        this.setCoverageId(id);
+    }
 }

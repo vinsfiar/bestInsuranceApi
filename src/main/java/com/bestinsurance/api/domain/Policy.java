@@ -15,7 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "policies")
 @EntityListeners(AuditingEntityListener.class)
-public class Policy {
+public class Policy implements DomainObject<UUID> {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -127,4 +127,8 @@ public class Policy {
         this.coverages = coverages;
     }
 
+    @Override
+    public void setId(UUID id) {
+        this.setPolicyId(id);
+    }
 }

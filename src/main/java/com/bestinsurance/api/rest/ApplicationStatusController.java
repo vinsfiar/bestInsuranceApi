@@ -5,9 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Sample REST Controller that declares a service that returns the value of the property api.version
- */
 @RestController
 @RequestMapping("/status")
 public class ApplicationStatusController {

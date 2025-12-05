@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "states")
-public class State {
+public class State implements DomainObject<UUID>{
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -93,4 +93,8 @@ public class State {
         this.stateAddresses = stateAddresses;
     }
 
- }
+    @Override
+    public void setId(UUID id) {
+        this.setStateId(id);
+    }
+}

@@ -16,6 +16,7 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.annotation.MultipartConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -86,6 +87,7 @@ public class SubscriptionController extends AbstractCrudController<SubscriptionC
     }
 
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+
     public String uploadFile(@RequestParam(value = "file") MultipartFile file) throws Exception {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<CsvSubscriptions> csvToBean = new CsvToBeanBuilder<CsvSubscriptions>(reader)

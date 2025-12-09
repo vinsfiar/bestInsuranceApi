@@ -2,37 +2,46 @@ package com.bestinsurance.api.controllers;
 
 import com.bestinsurance.api.domain.*;
 import com.bestinsurance.api.dto.SubscriptionCreation;
+import com.bestinsurance.api.dto.SubscriptionLogMsg;
 import com.bestinsurance.api.repos.CoverageRepository;
 import com.bestinsurance.api.repos.CustomerRepository;
 import com.bestinsurance.api.repos.PolicyRepository;
 import com.bestinsurance.api.repos.SubscriptionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.jms.TextMessage;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = { "eventlistener.enabled=true" })
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SubscriptionCRUDControllerTest {
@@ -51,20 +60,33 @@ public class SubscriptionCRUDControllerTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Autowired
+    private JmsTemplate jmsTemplate;
+
+    @Autowired
     private MockMvc mockMvc;
+
+    @Value("${eventlistener.queue.name}")
+    String queueName;
 
     private Customer customer;
     private Policy policy;
 
     private Subscription subscription;
 
-
     @BeforeAll
-    public void init() {
+    public void init() throws Exception {
         om.registerModule(new JavaTimeModule());
         this.customer = createTestCustomer();
         this.policy = createTestPolicy("init");
         this.subscription = createSubscription(this.customer, this.policy);
+        this.checkJMSMessageAndConsume(this.customer.getCustomerId(), this.policy.getPolicyId());
+    }
+
+    @AfterAll
+    public void cleanup() {
+        this.subscriptionRepository.deleteAll();
+        this.customerRepository.deleteAll();
+        this.policyRepository.deleteAll();
     }
 
 
@@ -88,7 +110,7 @@ public class SubscriptionCRUDControllerTest {
                 .andReturn();
         //JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
         //Cleanup The created Policy
-
+        this.checkJMSMessageAndConsume(this.customer.getCustomerId(), testPolicy.getPolicyId());
     }
 
     @Test
@@ -127,6 +149,8 @@ public class SubscriptionCRUDControllerTest {
                 .andExpect(jsonPath("$.policy.id", notNullValue()))
                 .andExpect(jsonPath("$.paidPrice", is(150)))
                 .andExpect(jsonPath("$.endDate", is(formattedDateTime)));
+
+        this.checkJMSMessageAndConsume(this.subscription.getCustomer().getCustomerId(), this.subscription.getPolicy().getPolicyId());
     }
 
     @Test
@@ -140,7 +164,7 @@ public class SubscriptionCRUDControllerTest {
                         .queryParam("idPolicy", testPolicy.getPolicyId().toString()))
                 .andDo(print())
                 .andExpect(status().isOk());
-
+        this.checkJMSMessageAndConsume(subscription1.getCustomer().getCustomerId(), testPolicy.getPolicyId());
     }
 
     private Customer createTestCustomer(){
@@ -197,4 +221,29 @@ public class SubscriptionCRUDControllerTest {
         return subscriptionRepository.save(subscription);
     }
 
+    private void checkJMSMessageAndConsume(UUID checkIdCustomer, UUID checkIdPolicy) throws Exception {
+        this.jmsTemplate.<TextMessage>browse(this.queueName, (session, browser) -> {
+            Enumeration<?> browserEnumeration = browser.getEnumeration();
+            assertTrue(browserEnumeration.hasMoreElements());
+            boolean messageSent = false;
+            TextMessage message = null;
+            while (browserEnumeration.hasMoreElements() && !messageSent) {
+                message = (TextMessage) browserEnumeration.nextElement();
+                String logMessageJson = message.getText();
+                try {
+                    SubscriptionLogMsg logMessage = om.readValue(logMessageJson, SubscriptionLogMsg.class);
+
+                    if (checkIdCustomer.equals(logMessage.getCustomerId()) && checkIdPolicy.equals(logMessage.getPolicyId())) {
+                        messageSent = true;
+
+                    }
+                } catch (Exception e) {
+                    fail();
+                }
+            }
+            assertTrue(messageSent);
+            return message;
+        });
+
+    }
 }

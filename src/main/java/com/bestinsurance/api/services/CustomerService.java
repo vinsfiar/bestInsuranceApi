@@ -3,9 +3,7 @@ package com.bestinsurance.api.services;
 import com.bestinsurance.api.domain.Customer;
 import com.bestinsurance.api.repos.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.CrudRepository;
@@ -45,7 +43,7 @@ public class CustomerService extends AbstractCrudService<Customer, UUID>{
     }
 
     public List<Customer> findAllWithFilters(String name, String surname, String email, Integer ageFrom, Integer ageTo,
-                                             OrderBy orderBy, OrderDirection direction){
+                                             OrderBy orderBy, OrderDirection direction, Integer pageSize, Integer pageNumber){
 
         Customer customer = new Customer();
         customer.setName(name);
@@ -68,26 +66,18 @@ public class CustomerService extends AbstractCrudService<Customer, UUID>{
                 default -> sort = Sort.by(Sort.Direction.ASC, orderBy.name());
             }
         }
-        Iterable<Customer> all = customerRepository.findAll(this.getSpecFromDatesAndExample(ageFrom, ageTo, exampleCustomer),sort);
-        List<Customer> customerList = new ArrayList<Customer>();
-        all.iterator().forEachRemaining(customerList::add);
+
+        List<Customer> customerList;
+
+        if (pageNumber != null && pageSize !=null ) {
+            Page<Customer> customers = customerRepository.findAll(this.getSpecFromDatesAndExample(ageFrom, ageTo, exampleCustomer), PageRequest.of(pageNumber, pageSize, sort));
+            customerList = customers.stream().toList();
+        } else {
+            Iterable<Customer> all = customerRepository.findAll(this.getSpecFromDatesAndExample(ageFrom, ageTo, exampleCustomer), sort);
+            customerList = new ArrayList<Customer>();
+            all.iterator().forEachRemaining(customerList::add);
+        }
         return customerList;
-    }
-
-    public List<Customer> findByPolicy(UUID policyId) {
-        return this.customerRepository.selectCustomersByPolicy(policyId);
-    }
-
-    public List<Customer> findByCoverage(UUID coverageId) {
-        return this.customerRepository.selectCustomersByCoverage(coverageId);
-    }
-
-    public List<Customer> findWithDiscount() {
-        return this.customerRepository.selectCustomersWithDiscount();
-    }
-
-    public List<Customer> findWithSubscriptionBetween(LocalDate start, LocalDate end) {
-        return this.customerRepository.selectCustomersWithSubscriptionBetween(start, end);
     }
 
     private Specification<Customer> getSpecFromDatesAndExample(Integer ageFrom, Integer ageTo, Example<Customer> example) {
@@ -106,5 +96,22 @@ public class CustomerService extends AbstractCrudService<Customer, UUID>{
             return builder.and(predicates.toArray(Predicate[] :: new));
         };
     }
+
+    public List<Customer> findByPolicy(UUID policyId) {
+        return this.customerRepository.selectCustomersByPolicy(policyId);
+    }
+
+    public List<Customer> findByCoverage(UUID coverageId) {
+        return this.customerRepository.selectCustomersByCoverage(coverageId);
+    }
+
+    public List<Customer> findWithDiscount() {
+        return this.customerRepository.selectCustomersWithDiscount();
+    }
+
+    public List<Customer> findWithSubscriptionBetween(LocalDate start, LocalDate end) {
+        return this.customerRepository.selectCustomersWithSubscriptionBetween(start, end);
+    }
+    
 
 }

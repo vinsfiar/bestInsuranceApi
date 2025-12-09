@@ -8,15 +8,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class PersistenceEntitiesUtil {
-    /*
-     * The ids in this array matches with the ids in the src/main/resources/db/changelog/cities_data.csv directory
-     * that are automatically loaded in the db by liquibase
-     */
-    public static String[] cityIds = {"45576d7c-8d84-4422-9440-19ef80fa16f3",
-            "91f360d5-811b-417c-a202-f5ba4b34b895",
-            "144b05b6-ebf6-43a8-836d-0998c2c20a3c",
-            "74716a04-d538-4441-84bf-7c41470778ca",
-            "eb5e9505-8580-4857-9195-6bee0324ac0f"};
+
 
     public static Customer instanceCustomer(String name, String surname, String email, LocalDate birthDate, Address address) {
         Customer c = new Customer();
@@ -55,7 +47,9 @@ public class PersistenceEntitiesUtil {
         policy.setName(name);
         policy.setDescription(description);
         policy.setPrice(price);
-        policy.setCoverages(Arrays.stream(coverages).collect(Collectors.toSet()));
+        if (coverages != null && coverages.length > 0) {
+            policy.setCoverages(Arrays.stream(coverages).collect(Collectors.toSet()));
+        }
         return policy;
     }
 

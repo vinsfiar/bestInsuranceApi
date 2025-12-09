@@ -10,6 +10,7 @@ import java.util.UUID;
 
 
 public interface PolicyRepository extends CrudRepository<Policy, UUID>, QueryByExampleExecutor<Policy> {
+    Policy findByName(String name);
     List<Policy> findByPriceGreaterThanOrderByNameAsc(BigDecimal price);
     List<Policy> findByPriceGreaterThanOrderByPriceAsc(BigDecimal price);
     List<Policy> findByPriceLessThanOrderByNameAsc(BigDecimal price);

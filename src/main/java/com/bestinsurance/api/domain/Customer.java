@@ -31,6 +31,8 @@ public class Customer implements DomainObject<UUID>{
     @Column(nullable = false, length = 320)
     private String email;
 
+    @Column(length = 20)
+    private String telephoneNumber;
     @Column
     private LocalDate birthDate;
 
@@ -132,6 +134,14 @@ public class Customer implements DomainObject<UUID>{
 
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
     }
 
     @Override

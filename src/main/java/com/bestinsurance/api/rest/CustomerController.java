@@ -34,6 +34,8 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
     public final static String AGE_TO = "ageTo";
     public final static String ORDER_BY = "orderBy";
     public final static String ORDER_DIRECTION = "orderDirection";
+    public final static String PAGE_NUMBER = "pageNumber";
+    public final static String PAGE_SIZE = "pageSize";
     @Autowired
     private CustomerService customerService;
 
@@ -49,12 +51,14 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
     @Parameter(in = ParameterIn.QUERY, name = AGE_TO, schema = @Schema(type="number"), required = false)
     @Parameter(in = ParameterIn.QUERY, name = ORDER_BY, schema = @Schema(type="string" , allowableValues = {NAME, SURNAME, EMAIL, AGE}), required = false)
     @Parameter(in = ParameterIn.QUERY, name = ORDER_DIRECTION, schema = @Schema(type="string", allowableValues = {"ASC", "DESC"}), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = PAGE_NUMBER, schema = @Schema(type="number"), required = false)
+    @Parameter(in = ParameterIn.QUERY, name = PAGE_SIZE, schema = @Schema(type="number"), required = false)
     @Override
     public List<CustomerView> all(Map<String, String> filters) {
         try {
             Integer ageFrom = filters.get(AGE_FROM) == null ? null : Integer.valueOf(filters.get(AGE_FROM));
             Integer ageTo = filters.get(AGE_TO) == null ? null : Integer.valueOf(filters.get(AGE_TO));
-            if (!(ageFrom == null && ageTo == null) && (ageFrom == null || ageTo == null)){
+            if (!(ageFrom == null && ageTo == null) && (ageFrom == null || ageTo == null)) {
                 throw new IllegalArgumentException("When searching by age, ageFrom and ageTo are mandatory");
             }
             if (ageFrom != null && ageFrom > ageTo) { //check on ageTo doesn't make sense because here the only null case is both dates null, so checking ageFrom is enough
@@ -62,7 +66,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             }
             String orderByParam = filters.get(ORDER_BY);
             CustomerService.OrderBy orderBy;
-            if (orderByParam != null){
+            if (orderByParam != null) {
                 if (AGE.equalsIgnoreCase(orderByParam)) {
                     orderBy = CustomerService.OrderBy.birthDate;
                 } else {
@@ -75,9 +79,14 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             CustomerService.OrderDirection orderDirection = filters.get(ORDER_DIRECTION) == null ? null :
                     CustomerService.OrderDirection.valueOf(filters.get(ORDER_DIRECTION).toUpperCase());
 
+            Integer pageNumber = filters.get(PAGE_NUMBER) == null ? null : Integer.valueOf(filters.get(PAGE_NUMBER));
+            Integer pageSize = filters.get(PAGE_SIZE) == null ? 10 : Integer.valueOf(filters.get(PAGE_SIZE));
             return customerService.findAllWithFilters(filters.get(NAME), filters.get(SURNAME),
-                            filters.get(EMAIL), ageFrom, ageTo, orderBy, orderDirection).stream()
+                            filters.get(EMAIL), ageFrom, ageTo, orderBy, orderDirection, pageSize, pageNumber).stream()
                     .map(this.getSearchDtoMapper()::map).toList();
+        } catch (NumberFormatException nfe) {
+            logger.error("Error during search: ", nfe);
+            throw new IllegalArgumentException("Check the integer parameters value");
         } catch (Exception e){
             logger.error("Error during search: ", e);
             throw new RuntimeException(e.getMessage());

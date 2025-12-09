@@ -5,6 +5,7 @@ import com.bestinsurance.api.domain.Policy;
 import com.bestinsurance.api.domain.Subscription;
 import com.bestinsurance.api.domain.SubscriptionId;
 import com.bestinsurance.api.dto.SubscriptionCreation;
+import com.bestinsurance.api.dto.SubscriptionRevenueView;
 import com.bestinsurance.api.dto.SubscriptionUpdate;
 import com.bestinsurance.api.dto.SubscriptionView;
 import com.bestinsurance.api.dto.mappers.CustomerViewMapper;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 /**
@@ -62,6 +64,17 @@ public class SubscriptionController extends AbstractCrudController<SubscriptionC
     @Override
     protected CrudService<Subscription, SubscriptionId> getService() {
         return this.subscriptionService;
+    }
+
+    @GetMapping("revenues")
+    public List<SubscriptionRevenueView> getRevenuesByState() {
+        try {
+            return this.subscriptionService.computeRevenues().stream()
+                    .map(x -> new SubscriptionRevenueView(x.stateName(),x.revenue(), x.customersCount())).toList();
+        } catch (Exception e){
+            logger.error("Error during getRevenuesByState: ", e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override

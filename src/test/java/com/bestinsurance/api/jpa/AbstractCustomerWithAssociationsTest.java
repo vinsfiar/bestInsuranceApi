@@ -16,7 +16,11 @@ import static com.bestinsurance.api.jpa.PersistenceEntitiesUtil.*;
 import static com.bestinsurance.api.jpa.PersistenceEntitiesUtil.instanceSubscription;
 
 public abstract class AbstractCustomerWithAssociationsTest {
-
+    public static String[] cityIds = {"45576d7c-8d84-4422-9440-19ef80fa16f3",
+            "91f360d5-811b-417c-a202-f5ba4b34b895",
+            "144b05b6-ebf6-43a8-836d-0998c2c20a3c",
+            "74716a04-d538-4441-84bf-7c41470778ca",
+            "eb5e9505-8580-4857-9195-6bee0324ac0f"};
     @Autowired
     protected CustomerRepository customerRepository;
     @Autowired

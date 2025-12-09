@@ -1,11 +1,14 @@
 package com.bestinsurance.api.services;
 
+import com.bestinsurance.api.domain.StateSubscriptionRevenue;
 import com.bestinsurance.api.domain.Subscription;
 import com.bestinsurance.api.domain.SubscriptionId;
 import com.bestinsurance.api.repos.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
+
 /**
  * Service class managing the Subscriptions.-.
  */
@@ -24,5 +27,9 @@ public class SubcriptionService extends AbstractCrudService<Subscription, Subscr
         super.updatePreSave(fetchedObj, toSave);
         toSave.setPolicy(fetchedObj.getPolicy());
         toSave.setCustomer(fetchedObj.getCustomer());
+    }
+
+    public List<StateSubscriptionRevenue> computeRevenues() {
+        return this.subscriptionRepository.selectStatesRevenues();
     }
 }

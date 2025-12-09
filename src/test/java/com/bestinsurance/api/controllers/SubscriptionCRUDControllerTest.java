@@ -8,6 +8,7 @@ import com.bestinsurance.api.repos.PolicyRepository;
 import com.bestinsurance.api.repos.SubscriptionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -67,6 +68,12 @@ public class SubscriptionCRUDControllerTest {
         this.subscription = createSubscription(this.customer, this.policy);
     }
 
+    @AfterAll
+    public void cleanup() {
+        this.subscriptionRepository.deleteAll();
+        this.customerRepository.deleteAll();
+        this.policyRepository.deleteAll();
+    }
 
     @Test
     public void testCreateSubscription() throws Exception  {

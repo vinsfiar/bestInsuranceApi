@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Comparator;
 
@@ -127,28 +129,43 @@ public class CustomerControllerFiltersTest extends AbstractCustomerInitializedTe
         new CustomerSearchTestHelper().setEmail("AN").runTest(5);
     }
 
+    @Test
+    public void testAgeFromToPaged() throws Exception {
+        new CustomerSearchTestHelper().setAgeFrom("0").setAgeTo("60").setPageSize("20").setPageNumber("1")
+                .runTest(20);
+    }
+
+    @Test
+    public void testAgeFromToPagedDefaultPageSize() throws Exception {
+        new CustomerSearchTestHelper().setAgeFrom("30").setAgeTo("60").setPageNumber("1")
+                .runTest(10);
+    }
+
 
     private class CustomerSearchTestHelper {
         private String name;
         private String surname;
         private String email;
-        private String age;
         private String ageFrom;
         private String ageTo;
         private String orderBy;
         private String orderDirection;
+        private String pageNumber;
+        private String pageSize;
 
         private void runTest(int expectedResults) throws Exception {
-            MvcResult mvcResult = mockMvc.perform(get("/customers")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .queryParam(CustomerController.NAME, name)
-                            .queryParam(CustomerController.SURNAME, surname)
-                            .queryParam(CustomerController.EMAIL, email)
-                            .queryParam(CustomerController.AGE_FROM, ageFrom)
-                            .queryParam(CustomerController.AGE_TO, ageTo)
-                            .queryParam(CustomerController.ORDER_BY, orderBy)
-                            .queryParam(CustomerController.ORDER_DIRECTION, orderDirection))
-                    .andExpect(status().isOk())
+            MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get("/customers").contentType(MediaType.APPLICATION_JSON);
+            if (name != null) mockHttpServletRequestBuilder.queryParam(CustomerController.NAME, name);
+            if (surname != null) mockHttpServletRequestBuilder.queryParam(CustomerController.SURNAME, surname);
+            if (email != null) mockHttpServletRequestBuilder.queryParam(CustomerController.EMAIL, email);
+            if (ageFrom != null) mockHttpServletRequestBuilder.queryParam(CustomerController.AGE_FROM, ageFrom);
+            if (ageTo!=null) mockHttpServletRequestBuilder.queryParam(CustomerController.AGE_TO, ageTo);
+            if (orderBy != null) mockHttpServletRequestBuilder.queryParam(CustomerController.ORDER_BY, orderBy);
+            if (orderDirection != null) mockHttpServletRequestBuilder.queryParam(CustomerController.ORDER_DIRECTION, orderDirection);
+            if (pageNumber != null) mockHttpServletRequestBuilder.queryParam(CustomerController.PAGE_NUMBER, pageNumber);
+            if (pageSize != null) mockHttpServletRequestBuilder.queryParam(CustomerController.PAGE_SIZE, pageSize);
+            ResultActions actions = mockMvc.perform(mockHttpServletRequestBuilder);
+            MvcResult mvcResult =  actions.andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(expectedResults)))
                     .andReturn();
             boolean ascending = orderDirection==null || !orderDirection.equals("DESC");
@@ -225,6 +242,16 @@ public class CustomerControllerFiltersTest extends AbstractCustomerInitializedTe
 
         public CustomerSearchTestHelper setOrderDirection(String orderDirection) {
             this.orderDirection = orderDirection;
+            return this;
+        }
+
+        public CustomerSearchTestHelper setPageNumber(String pageNumber) {
+            this.pageNumber = pageNumber;
+            return this;
+        }
+
+        public CustomerSearchTestHelper setPageSize(String pageSize) {
+            this.pageSize = pageSize;
             return this;
         }
     }

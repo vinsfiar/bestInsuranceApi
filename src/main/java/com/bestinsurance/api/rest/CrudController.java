@@ -1,5 +1,7 @@
 package com.bestinsurance.api.rest;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import java.util.Map;
  * @param <UpdateDTO> Dto Generic for the update operation
  * @param <SearchDTO> Dto Generic for the search operation
  */
+@OpenAPIDefinition(info = @Info(title = "BestInsurance API", version = "v1"))
 public interface CrudController<CreateDTO, UpdateDTO, SearchDTO> {
     /**
      * Create a new Object mapping the CreateDTO into a domain object

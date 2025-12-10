@@ -12,6 +12,7 @@ import com.bestinsurance.api.services.PolicyService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import java.util.UUID;
  * Controller impelmenting the Policies crud API
  */
 @RestController
+@SecurityRequirement(name = "security_auth")
 @RequestMapping("/policies")
 public class PolicyController extends AbstractSimpleIdCrudController<PolicyCreation, PolicyUpdate, PolicyView, Policy> {
     public static final String NAME_CONTAINS = "nameContains";

@@ -111,7 +111,6 @@ public class SubscriptionCRUDControllerTest {
                 .andExpect(jsonPath("$.policy.id", notNullValue()))
                 .andReturn();
         //JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        //Cleanup The created Policy
         this.checkJMSMessageAndConsume(this.customer.getCustomerId(), testPolicy.getPolicyId());
     }
 

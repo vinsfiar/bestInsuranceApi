@@ -112,6 +112,6 @@ public class CustomerService extends AbstractCrudService<Customer, UUID>{
     public List<Customer> findWithSubscriptionBetween(LocalDate start, LocalDate end) {
         return this.customerRepository.selectCustomersWithSubscriptionBetween(start, end);
     }
-    
+
 
 }

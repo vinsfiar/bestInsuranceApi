@@ -1,1 +1,18 @@
 REST Services with Spring and JPA
+
+This repo contains the implementation for this project:
+https://www.manning.com/liveprojectseries/design-implement-rest-services-spring-jpa
+
+and is organized in 6 subprojects, each one contained in a dedicated branch.
+
+The project covers the following topics:
+- containerize Java Spring Boot app using docker and docker compose
+- connect to database using Spring Data JPA and TestContainers for database integration test
+- implement Rest service and generate a SwaggerUI and OpenApi documentation with SpringDoc
+- implement queries using JPQL
+- implement back office service using ActiveMQ Artemis
+- implement authorization for the API using Spring Security and OAuth 2.0 authentication
+
+Run the app (run_maven.sh or run_gradle.sh) then open this page for manual testing and documentation
+
+http://127.0.0.1:8080/swagger-ui/index.html

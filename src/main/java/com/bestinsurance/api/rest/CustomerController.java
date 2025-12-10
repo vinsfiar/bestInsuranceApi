@@ -11,9 +11,11 @@ import com.bestinsurance.api.services.CustomerService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ import java.util.UUID;
  * Controller impelmenting the Customers crud API
  */
 @RestController
+@SecurityRequirement(name = "security_auth")
 @RequestMapping("/customers")
 public class CustomerController extends AbstractSimpleIdCrudController<CustomerCreation, CustomerUpdate, CustomerView, Customer> {
     public final static String NAME = "name";
@@ -93,6 +96,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
         }
     }
 
+    @Secured({"ROLE_FRONT_OFFICE", "ROLE_ADMIN"}) //Non-final values are not allowed :(
     @GetMapping("/policy/{" + ID + "}")
     @Parameter(in = ParameterIn.PATH, name = ID, schema = @Schema(type="string"), required = true)
     public List<CustomerView> searchByPolicy(@PathVariable Map<String, String> id) {
@@ -104,7 +108,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             throw new RuntimeException(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_FRONT_OFFICE", "ROLE_ADMIN"})
     @GetMapping("/coverage/{" + ID + "}")
     @Parameter(in = ParameterIn.PATH, name = ID, schema = @Schema(type="string"), required = true)
     public List<CustomerView> searchByCoverage(@PathVariable Map<String, String> id) {
@@ -116,7 +120,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             throw new RuntimeException(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_FRONT_OFFICE", "ROLE_ADMIN"})
     @GetMapping("/subscriptions/discountedPrice")
     public List<CustomerView> searchWithDiscount() {
         try {
@@ -127,7 +131,7 @@ public class CustomerController extends AbstractSimpleIdCrudController<CustomerC
             throw new RuntimeException(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_FRONT_OFFICE", "ROLE_ADMIN"})
     @GetMapping("/subscriptions")
     public List<CustomerView> searchWithSubscriptionBetween(
             @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd") LocalDate startDate,

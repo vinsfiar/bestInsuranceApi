@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -56,6 +57,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         coveragesIds.add(coverages.get(2).getCoverageId().toString());
         policy.setCoveragesIds(coveragesIds);
         MvcResult mvcResult = mockMvc.perform(post("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(policy)))
                 .andDo(print())
@@ -67,6 +69,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testAllFiltersInitialized() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE_LESS_THAN, "300.50")
@@ -79,6 +82,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByPrice(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE_LESS_THAN , "300")
@@ -90,6 +94,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE_LESS_THAN , "300")
@@ -105,6 +110,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testPriceNameSearch() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE , "100")
@@ -115,6 +121,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE , "100"))
@@ -124,6 +131,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "A")
                         .queryParam(PolicyController.PRICE , "100")
@@ -138,6 +146,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testBetweenPrices() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE_LESS_THAN , "300")
                         .queryParam(PolicyController.PRICE_MORE_THAN , "150")
@@ -148,6 +157,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByPrice(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE_LESS_THAN , "300")
                         .queryParam(PolicyController.PRICE_MORE_THAN , "150")
@@ -158,6 +168,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE_LESS_THAN , "300")
                         .queryParam(PolicyController.PRICE_MORE_THAN , "150"))
@@ -170,6 +181,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testNameSearch() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "Double")
                         .queryParam(PolicyController.ORDERBY , "PRICE"))
@@ -179,6 +191,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByPrice(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "Double")
                         .queryParam(PolicyController.ORDERBY , "NAME"))
@@ -188,6 +201,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "Double"))
                 .andExpect(status().isOk())
@@ -199,6 +213,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testPriceSearch() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE , "200")
                         .queryParam(PolicyController.ORDERBY , "PRICE"))
@@ -208,6 +223,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE , "200")
                         .queryParam(PolicyController.ORDERBY , "PRICE"))
@@ -217,6 +233,7 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
         assertTrue(checkOrderByName(om.readValue(mvcResult.getResponse().getContentAsString(), PolicyView[].class)));
 
         mvcResult = mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.PRICE , "200"))
                 .andExpect(status().isOk())
@@ -229,12 +246,14 @@ public class PolicyControllerTest extends AbstractPolicyInitializedTest {
     @Test
     public void testOrderbyLowerCase() throws Exception {
         mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "Double")
                         .queryParam(PolicyController.ORDERBY , "price"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$" , hasSize(10)));
         mockMvc.perform(get("/policies")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam(PolicyController.NAME_CONTAINS, "Double")
                         .queryParam(PolicyController.ORDERBY , "name"))

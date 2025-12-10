@@ -16,7 +16,7 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.servlet.annotation.MultipartConfig;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -28,11 +28,13 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 /**
  * Controller impelmenting the Subscription crud API
  * This class extends the AbstractCrudController because it has a composite id
  */
 @RestController
+@SecurityRequirement(name = "security_auth")
 @RequestMapping("/subscriptions")
 public class SubscriptionController extends AbstractCrudController<SubscriptionCreation, SubscriptionUpdate,
         SubscriptionView, Subscription, SubscriptionId> {
@@ -87,7 +89,6 @@ public class SubscriptionController extends AbstractCrudController<SubscriptionC
     }
 
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-
     public String uploadFile(@RequestParam(value = "file") MultipartFile file) throws Exception {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<CsvSubscriptions> csvToBean = new CsvToBeanBuilder<CsvSubscriptions>(reader)

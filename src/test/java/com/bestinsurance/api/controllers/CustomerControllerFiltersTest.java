@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -154,7 +155,9 @@ public class CustomerControllerFiltersTest extends AbstractCustomerInitializedTe
         private String pageSize;
 
         private void runTest(int expectedResults) throws Exception {
-            MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get("/customers").contentType(MediaType.APPLICATION_JSON);
+            MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get("/customers")
+                    .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
+                    .contentType(MediaType.APPLICATION_JSON);
             if (name != null) mockHttpServletRequestBuilder.queryParam(CustomerController.NAME, name);
             if (surname != null) mockHttpServletRequestBuilder.queryParam(CustomerController.SURNAME, surname);
             if (email != null) mockHttpServletRequestBuilder.queryParam(CustomerController.EMAIL, email);

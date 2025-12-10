@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -101,6 +102,7 @@ public class SubscriptionCRUDControllerTest {
         subscriptionDTO.setEndDate(LocalDate.now().plusYears(1));
         subscriptionDTO.setPaidPrice(new BigDecimal(100.00));
         MvcResult mvcResult = mockMvc.perform(post("/subscriptions")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(subscriptionDTO)))
                 .andDo(print())
@@ -117,6 +119,7 @@ public class SubscriptionCRUDControllerTest {
     public void testFindById() throws Exception {
          mockMvc.perform(get("/subscriptions/{idCustomer}/{idPolicy}", this.subscription.getCustomer().getCustomerId().toString()
                          , this.subscription.getPolicy().getPolicyId().toString())
+                         .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                  .contentType(MediaType.APPLICATION_JSON)
                  .queryParam("idCustomer", this.customer.getCustomerId().toString())
                  .queryParam("idPolicy", this.policy.getPolicyId().toString()))
@@ -139,6 +142,7 @@ public class SubscriptionCRUDControllerTest {
 
         mockMvc.perform(put("/subscriptions/{idCustomer}/{idPolicy}", this.subscription.getCustomer().getCustomerId().toString()
                         , this.subscription.getPolicy().getPolicyId().toString())
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam("idCustomer", this.customer.getCustomerId().toString())
                         .queryParam("idPolicy", this.policy.getPolicyId().toString())
@@ -159,6 +163,7 @@ public class SubscriptionCRUDControllerTest {
         Subscription subscription1 = createSubscription(this.customer, testPolicy);
         mockMvc.perform(delete("/subscriptions/{idCustomer}/{idPolicy}", subscription1.getCustomer().getCustomerId().toString()
                         , subscription1.getPolicy().getPolicyId().toString())
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam("idCustomer", customer.getCustomerId().toString())
                         .queryParam("idPolicy", testPolicy.getPolicyId().toString()))
@@ -221,29 +226,34 @@ public class SubscriptionCRUDControllerTest {
         return subscriptionRepository.save(subscription);
     }
 
+    /**
+     * Checks if the subscription has been notified.-.
+     * @param checkIdCustomer
+     * @param checkIdPolicy
+     * @throws Exception
+     */
     private void checkJMSMessageAndConsume(UUID checkIdCustomer, UUID checkIdPolicy) throws Exception {
-        this.jmsTemplate.<TextMessage>browse(this.queueName, (session, browser) -> {
+        TextMessage browse = this.jmsTemplate.<TextMessage>browse(this.queueName, (session, browser) -> {
             Enumeration<?> browserEnumeration = browser.getEnumeration();
             assertTrue(browserEnumeration.hasMoreElements());
             boolean messageSent = false;
-            TextMessage message = null;
             while (browserEnumeration.hasMoreElements() && !messageSent) {
-                message = (TextMessage) browserEnumeration.nextElement();
+                TextMessage message = (TextMessage) browserEnumeration.nextElement();
                 String logMessageJson = message.getText();
                 try {
                     SubscriptionLogMsg logMessage = om.readValue(logMessageJson, SubscriptionLogMsg.class);
 
-                    if (checkIdCustomer.equals(logMessage.getCustomerId()) && checkIdPolicy.equals(logMessage.getPolicyId())) {
-                        messageSent = true;
+                if(checkIdCustomer.equals(logMessage.getCustomerId()) && checkIdPolicy.equals(logMessage.getPolicyId())) {
+                    messageSent = true;
 
-                    }
+                }
                 } catch (Exception e) {
                     fail();
                 }
             }
             assertTrue(messageSent);
-            return message;
+            return null;
         });
-
     }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.FileInputStream;
@@ -72,7 +73,8 @@ public class CsvUploadTest {
         ClassPathResource res = new ClassPathResource("customers.csv");
         MockMultipartFile multipartFile = new MockMultipartFile("file", new FileInputStream(res.getFile()));
         mockMvc.perform(multipart("/subscriptions/upload")
-                        .file(multipartFile))
+                        .file(multipartFile)
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
         Iterable<Customer> all = customerRepository.findAll();
         List<Customer> customers = new ArrayList<>();
@@ -85,7 +87,8 @@ public class CsvUploadTest {
         ClassPathResource res = new ClassPathResource("customers_nocityerror.csv");
         MockMultipartFile multipartFile = new MockMultipartFile("file", new FileInputStream(res.getFile()));
         mockMvc.perform(multipart("/subscriptions/upload")
-                        .file(multipartFile))
+                        .file(multipartFile)
+                    .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN")))
                 .andExpect(status().isNotFound());
         Iterable<Customer> all = customerRepository.findAll();
         List<Customer> customers = new ArrayList<>();
@@ -98,7 +101,8 @@ public class CsvUploadTest {
         ClassPathResource res = new ClassPathResource("customers_nostateerror.csv");
         MockMultipartFile multipartFile = new MockMultipartFile("file", new FileInputStream(res.getFile()));
         mockMvc.perform(multipart("/subscriptions/upload")
-                        .file(multipartFile))
+                        .file(multipartFile)
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN")))
                 .andExpect(status().isNotFound());
         Iterable<Customer> all = customerRepository.findAll();
         List<Customer> customers = new ArrayList<>();
@@ -120,7 +124,8 @@ public class CsvUploadTest {
         ClassPathResource res = new ClassPathResource("customers_emailtest.csv");
         MockMultipartFile multipartFile = new MockMultipartFile("file", new FileInputStream(res.getFile()));
         mockMvc.perform(multipart("/subscriptions/upload")
-                        .file(multipartFile))
+                        .file(multipartFile)
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
         Iterable<Customer> all = customerRepository.findAll();
         int size = 0;

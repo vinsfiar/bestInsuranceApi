@@ -35,7 +35,7 @@ public abstract class AbstractCrudController<CreateDTO, UpdateDTO , SearchDTO, D
     }
 
     @Override
-    public List<SearchDTO> all(Map<String, String> filters) {
+    public List<SearchDTO> all(Map<String, String> filters)  {
         try {
             return getService().findAll().stream().map(this.getSearchDtoMapper()::map).toList();
         } catch (Exception e){

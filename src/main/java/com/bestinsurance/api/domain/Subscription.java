@@ -66,6 +66,20 @@ public class Subscription implements Serializable, DomainObject<SubscriptionId> 
         return Objects.hash(id);
     }
 
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "id=" + id +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", paidPrice=" + paidPrice +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", policy=" + policy +
+                ", customer=" + customer +
+                '}';
+    }
+
     public void setId(SubscriptionId id) { this.id = id; }
 
     public LocalDate getStartDate() {
